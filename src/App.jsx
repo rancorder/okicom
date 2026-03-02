@@ -275,12 +275,15 @@ function ThreeDXFlowDemo({ isDX }) {
       color:nodes[Math.floor(Math.random()*nodes.length)].color,
     }));
 
-    let t=0, raf;
+    let t=0, fadeT=0, raf;
+    let lastDX = isDXRef.current;
     const lerp = (a,b,t) => a+(b-a)*t;
     const draw = () => {
       t += 0.016;
       const dx = isDXRef.current;
-      const fade = dx ? Math.min(t/1.5,1) : 1;
+      if(dx !== lastDX){ fadeT=0; lastDX=dx; }
+      fadeT += 0.016;
+      const fade = dx ? Math.min(fadeT/1.2,1) : 1;
       ctx.clearRect(0,0,w,h);
 
       if (!dx) {
@@ -324,7 +327,7 @@ function ThreeDXFlowDemo({ isDX }) {
         // draw hub connections
         nodes.forEach((n,ni) => {
           const grad = ctx.createLinearGradient(n.x,n.y,cx,cy);
-          grad.addColorStop(0,n.color.replace("#","")+`33`); // faint at node
+          grad.addColorStop(0,n.color+"33");
           grad.addColorStop(0.5,`rgba(59,130,246,${0.3*fade})`);
           grad.addColorStop(1,`rgba(30,64,175,${0.35*fade})`);
           ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(cx,cy);
