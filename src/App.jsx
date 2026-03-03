@@ -1420,7 +1420,7 @@ function S7_Value() {
       <Label>VALUE ── okicomが選ばれる4つの理由</Label>
       <div style={{fontFamily:VB,fontSize:"clamp(1.1rem,3.2vw,2.5rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.75rem,3vw,1.25rem)"}}>「ツールを売る」のではなく、<br/><span style={{color:C.blue}}>業務を変える</span>パートナー。</div>
       <div style={{display:"flex",flexDirection:"column",gap:"clamp(.4rem,1.5vw,.6rem)"}}>
-        {vals.map((v,i)=>(<div key={i} onClick={()=>{sfxSelect();setActive(active===i?null:i);}} style={{border:`1.5px solid ${active===i?v.color+"55":"rgba(30,64,175,.1)"}`,background:active===i?v.color+"06":"rgba(255,255,255,.65)",padding:"clamp(.7rem,2.8vw,1rem) clamp(.75rem,3vw,1.1rem)",cursor:"pointer",transition:"all .2s",position:"relative"}}>
+        {vals.map((v,i)=>(<div key={i} onClick={e=>{e.stopPropagation();sfxSelect();setActive(active===i?null:i);}} style={{border:`1.5px solid ${active===i?v.color+"55":"rgba(30,64,175,.1)"}`,background:active===i?v.color+"06":"rgba(255,255,255,.65)",padding:"clamp(.7rem,2.8vw,1rem) clamp(.75rem,3vw,1.1rem)",cursor:"pointer",transition:"all .2s",position:"relative"}}>
           {active===i&&<Corners color={v.color} size={14} t={1.2}/>}
           <div style={{display:"flex",alignItems:"center",gap:".75rem"}}>
             <span style={{fontFamily:V,fontSize:"clamp(.7rem,2.8vw,.85rem)",color:v.color,flexShrink:0}}>{v.num}</span>
@@ -1460,7 +1460,7 @@ function S8_Condition() {
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:"clamp(.4rem,1.5vw,.6rem)"}}>
         {conditions.map((c,i)=>(
-          <div key={i} onClick={()=>{sfxSelect();setActive(active===i?null:i);}}
+          <div key={i} onClick={e=>{e.stopPropagation();sfxSelect();setActive(active===i?null:i);}}
             style={{border:`1.5px solid ${active===i?c.color+"55":"rgba(30,64,175,.1)"}`,background:active===i?c.color+"06":"rgba(255,255,255,.65)",padding:"clamp(.7rem,2.8vw,1rem) clamp(.75rem,3vw,1.1rem)",cursor:"pointer",transition:"all .2s",position:"relative"}}>
             {active===i&&<Corners color={c.color} size={14} t={1.2}/>}
             <div style={{display:"flex",alignItems:"center",gap:".75rem"}}>
@@ -1517,7 +1517,7 @@ function S9_Flow() {
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:"clamp(.4rem,1.5vw,.6rem)"}}>
         {steps.map((s,i)=>(
-          <div key={i} onClick={()=>{sfxClick();setOpen(p=>({...p,[i]:!p[i]}));}}
+          <div key={i} onClick={e=>{e.stopPropagation();sfxClick();setOpen(p=>({...p,[i]:!p[i]}));}}
             style={{border:`1.5px solid ${open[i]?s.color+"55":"rgba(30,64,175,.1)"}`,background:open[i]?s.color+"06":"rgba(255,255,255,.65)",padding:"clamp(.7rem,2.5vw,.95rem) clamp(.75rem,3vw,1.1rem)",cursor:"pointer",transition:"all .2s",WebkitTapHighlightColor:"transparent",position:"relative"}}>
             {open[i]&&<Corners color={s.color} size={13} t={1}/>}
             <div style={{display:"flex",alignItems:"center",gap:".75rem"}}>
