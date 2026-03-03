@@ -89,8 +89,10 @@ function useThree(mountRef, active, setup, tick, orbitTarget = [0, 0, 0], initOr
     if (!sharedRenderer.current) {
       const r = new THREE.WebGLRenderer({ antialias: true });
       r.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      r.outputColorSpace = THREE.SRGBColorSpace;
+      r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.3;
+      r.physicallyCorrectLights = true;
       r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
-      r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.1;
       sharedRenderer.current = r;
     }
     const renderer = sharedRenderer.current;
@@ -102,6 +104,15 @@ function useThree(mountRef, active, setup, tick, orbitTarget = [0, 0, 0], initOr
     }
     const camera = new THREE.PerspectiveCamera(48, W / H, 0.1, 300);
     const scene = new THREE.Scene();
+    // ── 環境反射マップ（sharedRendererに1度だけ生成・全Sceneで共有）──
+    if (!sharedRenderer.envMap) {
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      const envScene = new THREE.Scene();
+      envScene.background = new THREE.Color(0x303040);
+      sharedRenderer.envMap = pmrem.fromScene(envScene).texture;
+      pmrem.dispose();
+    }
+    scene.environment = sharedRenderer.envMap;
     const state = Object.assign({ alive: true }, setup(scene, camera, renderer));
     const onResize = () => {
       if (!mountRef.current) return;
@@ -138,8 +149,8 @@ function useThree(mountRef, active, setup, tick, orbitTarget = [0, 0, 0], initOr
 function GISScene({ active }) {
   const mountRef = useRef(null);
   useThree(mountRef, active, (scene) => {
-    scene.background = new THREE.Color(0x080f1c);
-    scene.fog = new THREE.FogExp2(0x080f1c, 0.025);
+    scene.background = new THREE.Color(0x1a2230);
+    scene.fog = new THREE.FogExp2(0x1a2230, 0.020);
     const SEG = 120;
     const buildTerrain = () => {
       const g = new THREE.PlaneGeometry(22, 22, SEG, SEG); g.rotateX(-Math.PI / 2);
@@ -168,8 +179,12 @@ function GISScene({ active }) {
     });
     const sea=mkMesh(new THREE.PlaneGeometry(30,30),new THREE.MeshLambertMaterial({color:0x0d4f8a,transparent:true,opacity:.65}));
     sea.rotation.x=-Math.PI/2; sea.position.y=-2.05; scene.add(sea);
-    scene.add(new THREE.AmbientLight(0x334466,1.3));
-    const sun=new THREE.DirectionalLight(0xffeedd,2.8); sun.position.set(10,15,8); sun.castShadow=true; scene.add(sun);
+    scene.add(new THREE.AmbientLight(0xffffff,0.3));
+    const hemi=new THREE.HemisphereLight(0xffffff,0x202040,1.0); scene.add(hemi);
+    const sun=new THREE.DirectionalLight(0xffeedd,4); sun.position.set(10,15,8); sun.castShadow=true;
+    sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.left=-20; sun.shadow.camera.right=20; sun.shadow.camera.top=20; sun.shadow.camera.bottom=-20;
+    scene.add(sun);
+    const rim=new THREE.DirectionalLight(0x4466aa,2); rim.position.set(-8,6,-8); scene.add(rim);
     const grid=new THREE.GridHelper(22,22,0x00ffff,0x003344); grid.position.y=-2.1; grid.material.opacity=.25; grid.material.transparent=true; scene.add(grid);
     return {};
   }, null, [0,.5,0], {theta:.4,phi:1.0,r:20});
@@ -179,8 +194,8 @@ function GISScene({ active }) {
 function CIMScene({ active }) {
   const mountRef = useRef(null);
   useThree(mountRef, active, (scene) => {
-    scene.background = new THREE.Color(0x08101a);
-    scene.fog = new THREE.Fog(0x08101a,35,90);
+    scene.background = new THREE.Color(0x1a2230);
+    scene.fog = new THREE.Fog(0x1a2230,35,90);
     const floor=mkMesh(new THREE.PlaneGeometry(60,60),new THREE.MeshStandardMaterial({color:0x181e2a,roughness:.95}));
     floor.rotation.x=-Math.PI/2; scene.add(floor);
     const grid=new THREE.GridHelper(40,20,0x00aaff,0x003355); grid.material.opacity=.35; grid.material.transparent=true; scene.add(grid);
@@ -209,12 +224,13 @@ function CIMScene({ active }) {
       const bar=mkMesh(new THREE.BoxGeometry(10.4,.05,.05),new THREE.MeshStandardMaterial({color:0x889999,roughness:.9,metalness:.2}));
       bar.position.set(0,sy+1.5,4.25); scene.add(bar);
     }
-    const sun=new THREE.DirectionalLight(0xfff5e0,3); sun.castShadow=true;
-    sun.shadow.mapSize.width=2048; sun.shadow.mapSize.height=2048;
-    sun.shadow.camera.left=-30; sun.shadow.camera.right=30; sun.shadow.camera.top=30; sun.shadow.camera.bottom=-30;
+    const sun=new THREE.DirectionalLight(0xfff5e0,4); sun.castShadow=true;
+    sun.shadow.mapSize.set(2048,2048);
+    sun.shadow.camera.left=-20; sun.shadow.camera.right=20; sun.shadow.camera.top=20; sun.shadow.camera.bottom=-20;
     scene.add(sun);
-    scene.add(new THREE.AmbientLight(0x334466,1.1));
-    const fill=new THREE.PointLight(0x0088ff,1.5,30); fill.position.set(-10,8,-5); scene.add(fill);
+    scene.add(new THREE.AmbientLight(0xffffff,0.3));
+    const hemi=new THREE.HemisphereLight(0xffffff,0x202040,1.0); scene.add(hemi);
+    const rim=new THREE.DirectionalLight(0x4466aa,2); rim.position.set(-10,6,-8); scene.add(rim);
     [[5,.3,3],[-5,.3,3],[5,.3,-3],[-5,.3,-3]].forEach(([x,y,z])=>{
       const pl=new THREE.PointLight(0xffaa44,2,8); pl.position.set(x,y,z); scene.add(pl);
       const bulb=mkMesh(new THREE.SphereGeometry(.12,8,8),new THREE.MeshStandardMaterial({color:0xffaa44,emissive:0xff8800,emissiveIntensity:2}));
@@ -234,8 +250,8 @@ function CIMScene({ active }) {
 function FisheryScene({ active }) {
   const mountRef = useRef(null);
   useThree(mountRef, active, (scene) => {
-    scene.background = new THREE.Color(0x020e1a);
-    scene.fog = new THREE.FogExp2(0x021428,.022);
+    scene.background = new THREE.Color(0x1a2230);
+    scene.fog = new THREE.FogExp2(0x1a2230,.016);
     const SEG=80;
     const buildSeabed=()=>{
       const g=new THREE.PlaneGeometry(24,24,SEG,SEG); g.rotateX(-Math.PI/2);
@@ -274,8 +290,12 @@ function FisheryScene({ active }) {
     const dl=new THREE.PointLight(0x00ffff,2.5,4); drone.add(dl);
     const pts=[]; for(let i=0;i<=200;i++){const a=(i/200)*Math.PI*4;pts.push(new THREE.Vector3(Math.sin(a)*7,2.8+Math.sin(a*.5)*.4,Math.sin(a*.5)*5));}
     scene.add(mkLine(pts,new THREE.LineBasicMaterial({color:0x00ffff,transparent:true,opacity:.35})));
-    scene.add(new THREE.AmbientLight(0x112244,2));
-    const dirL=new THREE.DirectionalLight(0x4477aa,1.5); dirL.position.set(10,20,5); scene.add(dirL);
+    scene.add(new THREE.AmbientLight(0xffffff,0.3));
+    const hemi=new THREE.HemisphereLight(0xffffff,0x202040,1.0); scene.add(hemi);
+    const dirL=new THREE.DirectionalLight(0xddeeff,4); dirL.position.set(10,20,5); dirL.castShadow=true;
+    dirL.shadow.mapSize.set(2048,2048); dirL.shadow.camera.left=-20; dirL.shadow.camera.right=20; dirL.shadow.camera.top=20; dirL.shadow.camera.bottom=-20;
+    scene.add(dirL);
+    const rim=new THREE.DirectionalLight(0x4466aa,2); rim.position.set(-8,6,-8); scene.add(rim);
     const caustic=new THREE.PointLight(0x0066ff,2,22); caustic.position.set(0,2,0); scene.add(caustic);
     return {drone,props,wm,caustic,t:0};
   }, (state)=>{
@@ -295,8 +315,8 @@ function FisheryScene({ active }) {
 function IoTScene({ active }) {
   const mountRef = useRef(null);
   useThree(mountRef, active, (scene) => {
-    scene.background = new THREE.Color(0x050a12);
-    scene.fog = new THREE.Fog(0x050a12,40,100);
+    scene.background = new THREE.Color(0x1a2230);
+    scene.fog = new THREE.Fog(0x1a2230,40,100);
     const floor=mkMesh(new THREE.PlaneGeometry(40,30),new THREE.MeshStandardMaterial({color:0x111820,roughness:.9}));
     floor.rotation.x=-Math.PI/2; scene.add(floor);
     const grid=new THREE.GridHelper(40,40,0x00ff88,0x002222); grid.material.opacity=.2; grid.material.transparent=true; scene.add(grid);
@@ -332,8 +352,12 @@ function IoTScene({ active }) {
       const pipe=mkMesh(new THREE.CylinderGeometry(.08,.08,30,8),new THREE.MeshStandardMaterial({color:0x334455,metalness:.7}));
       pipe.rotation.z=Math.PI/2; pipe.position.set(0,5,px*.5); scene.add(pipe);
     }
-    scene.add(new THREE.AmbientLight(0x112233,1.5));
-    const ml=new THREE.DirectionalLight(0x88aacc,2); ml.position.set(5,15,5); ml.castShadow=true; scene.add(ml);
+    scene.add(new THREE.AmbientLight(0xffffff,0.3));
+    const hemi=new THREE.HemisphereLight(0xffffff,0x202040,1.0); scene.add(hemi);
+    const ml=new THREE.DirectionalLight(0xfff5e0,4); ml.position.set(5,15,5); ml.castShadow=true;
+    ml.shadow.mapSize.set(2048,2048); ml.shadow.camera.left=-20; ml.shadow.camera.right=20; ml.shadow.camera.top=20; ml.shadow.camera.bottom=-20;
+    scene.add(ml);
+    const rim=new THREE.DirectionalLight(0x4466aa,2); rim.position.set(-8,6,-8); scene.add(rim);
     return {machines,alerts,t:0};
   }, (state)=>{
     if(!state.alive)return;
@@ -357,8 +381,8 @@ function IoTScene({ active }) {
 function LogisticsScene({ active }) {
   const mountRef = useRef(null);
   useThree(mountRef, active, (scene) => {
-    scene.background = new THREE.Color(0x06080f);
-    scene.fog = new THREE.FogExp2(0x06080f,.018);
+    scene.background = new THREE.Color(0x1a2230);
+    scene.fog = new THREE.FogExp2(0x1a2230,.014);
     const road=mkMesh(new THREE.PlaneGeometry(30,30),new THREE.MeshStandardMaterial({color:0x0d1020,roughness:.95}));
     road.rotation.x=-Math.PI/2; scene.add(road);
     const grid=new THREE.GridHelper(30,15,0x1a2a4a,0x0a1525); grid.material.opacity=.6; grid.material.transparent=true; scene.add(grid);
@@ -392,8 +416,12 @@ function LogisticsScene({ active }) {
       marker.position.set(x,.8,z); scene.add(marker);
       const pl=new THREE.PointLight(routeColors[i],1.5,4); pl.position.set(x,1.5,z); scene.add(pl);
     });
-    scene.add(new THREE.AmbientLight(0x112233,1.3));
-    const sun=new THREE.DirectionalLight(0xffeedd,1.5); sun.position.set(10,20,5); sun.castShadow=true; scene.add(sun);
+    scene.add(new THREE.AmbientLight(0xffffff,0.3));
+    const hemi=new THREE.HemisphereLight(0xffffff,0x202040,1.0); scene.add(hemi);
+    const sun=new THREE.DirectionalLight(0xffeedd,4); sun.position.set(10,20,5); sun.castShadow=true;
+    sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.left=-20; sun.shadow.camera.right=20; sun.shadow.camera.top=20; sun.shadow.camera.bottom=-20;
+    scene.add(sun);
+    const rim=new THREE.DirectionalLight(0x4466aa,2); rim.position.set(-8,6,-8); scene.add(rim);
     return {trucks};
   }, (state)=>{
     if(!state.alive)return;
@@ -413,8 +441,8 @@ function LogisticsScene({ active }) {
 function HealthcareScene({ active }) {
   const mountRef = useRef(null);
   useThree(mountRef, active, (scene) => {
-    scene.background = new THREE.Color(0x04080f);
-    scene.fog = new THREE.Fog(0x04080f,30,80);
+    scene.background = new THREE.Color(0x1a2230);
+    scene.fog = new THREE.Fog(0x1a2230,30,80);
     const floor=mkMesh(new THREE.PlaneGeometry(30,20),new THREE.MeshStandardMaterial({color:0x0c1520,roughness:.7}));
     floor.rotation.x=-Math.PI/2; scene.add(floor);
     scene.add(new THREE.GridHelper(30,30,0x0a2030,0x051015));
@@ -447,8 +475,12 @@ function HealthcareScene({ active }) {
     const waveLine=new THREE.Line(waveGeo,new THREE.LineBasicMaterial({color:0x00ff88}));
     waveLine.userData.disposable=true;
     waveLine.position.set(-3.5,1.35,1.5); waveLine.scale.set(.3,.2,.3); scene.add(waveLine);
-    scene.add(new THREE.AmbientLight(0x112233,1.5));
-    const ml=new THREE.DirectionalLight(0x99bbdd,1.8); ml.position.set(5,15,3); ml.castShadow=true; scene.add(ml);
+    scene.add(new THREE.AmbientLight(0xffffff,0.3));
+    const hemi=new THREE.HemisphereLight(0xffffff,0x202040,1.0); scene.add(hemi);
+    const ml=new THREE.DirectionalLight(0xfff5e0,4); ml.position.set(5,15,3); ml.castShadow=true;
+    ml.shadow.mapSize.set(2048,2048); ml.shadow.camera.left=-20; ml.shadow.camera.right=20; ml.shadow.camera.top=20; ml.shadow.camera.bottom=-20;
+    scene.add(ml);
+    const rim=new THREE.DirectionalLight(0x4466aa,2); rim.position.set(-8,6,-8); scene.add(rim);
     return {vitals,waveLine,wavePos,t:0};
   }, (state)=>{
     if(!state.alive)return;
@@ -471,8 +503,8 @@ function HealthcareScene({ active }) {
 function AIAnalyticsScene({ active }) {
   const mountRef = useRef(null);
   useThree(mountRef, active, (scene) => {
-    scene.background = new THREE.Color(0x030508);
-    scene.fog = new THREE.FogExp2(0x030508,.025);
+    scene.background = new THREE.Color(0x1a2230);
+    scene.fog = new THREE.FogExp2(0x1a2230,.018);
     const colors=[0x00aaff,0xff8800,0x00ff88,0xff44aa,0xaa44ff];
     const nodes=[];
     for(let i=0;i<40;i++){
@@ -508,7 +540,12 @@ function AIAnalyticsScene({ active }) {
     pGeo.setAttribute("position",pPosAttr); pGeo.setAttribute("color",new THREE.BufferAttribute(pCol,3));
     const particles=mkPoints(pGeo,new THREE.PointsMaterial({size:.1,vertexColors:true,transparent:true,opacity:.5})); // .12→.1, .7→.5
     scene.add(particles);
-    scene.add(new THREE.AmbientLight(0x111133,2));
+    scene.add(new THREE.AmbientLight(0xffffff,0.3));
+    const hemi=new THREE.HemisphereLight(0xffffff,0x202040,1.0); scene.add(hemi);
+    const dirL=new THREE.DirectionalLight(0xfff5e0,4); dirL.position.set(8,12,5); dirL.castShadow=true;
+    dirL.shadow.mapSize.set(2048,2048); dirL.shadow.camera.left=-20; dirL.shadow.camera.right=20; dirL.shadow.camera.top=20; dirL.shadow.camera.bottom=-20;
+    scene.add(dirL);
+    const rim=new THREE.DirectionalLight(0x4466aa,2); rim.position.set(-8,6,-8); scene.add(rim);
     return {nodes,edgeLines,particles,pPos,t:0};
   }, (state)=>{
     if(!state.alive)return;
@@ -1083,14 +1120,24 @@ function S5_3DIndustryDemo({ industry }) {
           {DX_TABS.map(tab => (
             <button key={tab.id} onClick={() => { sfxSelect(); setSceneId(tab.id); setAutoSelected(false); }}
               style={{
-                background: sceneId===tab.id ? "linear-gradient(135deg,#0d1e3a,#061020)" : "transparent",
-                border: sceneId===tab.id ? "1px solid #00aaff44" : "1px solid #ffffff08",
-                borderBottom: sceneId===tab.id ? "1px solid #030810" : "1px solid #ffffff08",
+                background: sceneId===tab.id
+                  ? "linear-gradient(135deg,#0d2a4a,#071828)"
+                  : "rgba(255,255,255,0.04)",
+                border: sceneId===tab.id
+                  ? "1px solid #00ccff88"
+                  : "1px solid rgba(255,255,255,0.12)",
+                borderBottom: sceneId===tab.id ? "1px solid #030810" : "1px solid rgba(255,255,255,0.12)",
                 borderRadius:"4px 4px 0 0", padding:"5px 10px", cursor:"pointer",
-                color: sceneId===tab.id ? "#00ccff" : "#334455",
+                color: sceneId===tab.id ? "#00eeff" : "#8ab0cc",
+                textShadow: sceneId===tab.id
+                  ? "0 0 8px #00ccff, 0 0 18px #0088ff99"
+                  : "none",
+                boxShadow: sceneId===tab.id
+                  ? "0 0 10px #00aaff33, inset 0 1px 0 rgba(0,200,255,0.15)"
+                  : "none",
                 fontFamily:V, fontSize:"clamp(.55rem,1.6vw,.65rem)", letterSpacing:".06em",
                 whiteSpace:"nowrap", display:"flex", alignItems:"center", gap:4,
-                transition:"all .15s", WebkitTapHighlightColor:"transparent",
+                transition:"all .2s", WebkitTapHighlightColor:"transparent",
               }}>
               <span>{tab.icon}</span>
               <span style={{ display: "var(--tab-label-display, inline)" }}>{tab.label}</span>
