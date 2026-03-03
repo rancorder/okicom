@@ -1220,41 +1220,44 @@ function S0_Boot() {
   );
 }
 
-/* S1: Q1 */
-const DX_MOYAS=[
-  {id:"a",icon:"😓",text:"業務効率化したいが、何から手をつければいいかわからない"},
-  {id:"b",icon:"📊",text:"Excelや紙管理が限界で、でもシステム化する勇気がない"},
-  {id:"c",icon:"🔄",text:"ツールを入れたのに、現場が使ってくれない"},
-  {id:"d",icon:"💸",text:"コストをかけた割に、効果が見えない"},
-  {id:"e",icon:"🧩",text:"部門ごとにシステムがバラバラで、情報が繋がっていない"},
-  {id:"f",icon:"⏱️",text:"属人化が進んでいて、担当者が抜けると業務が止まる"},
-  {id:"g",icon:"🤷",text:"ベンダーに任せたら、現場のことを分かってもらえなかった"},
+/* S1: PURPOSE ── 今日の面談テーマを最初に選ぶ */
+const PURPOSES=[
+  {key:"efficiency",icon:"⚙️",label:"業務効率化",sub:"手作業・Excel管理・属人化を、仕組みで解消したい"},
+  {key:"dependency",icon:"🔗",label:"人依存の解消",sub:"特定の担当者がいないと回らない状態を変えたい"},
+  {key:"newbiz",    icon:"🚀",label:"新規サービス・基盤",sub:"新しいプラットフォームやシステムを立ち上げたい"},
+  {key:"renewal",  icon:"🔄",label:"システム刷新",sub:"古い基幹システムや分散した管理を一本化したい"},
 ];
-function S1_Q1() {
-  const [checks,setChecks]=useState({});
-  const toggle=(id,e)=>{e.stopPropagation();sfxClick();setChecks(p=>({...p,[id]:!p[id]}));};
-  const count=Object.values(checks).filter(Boolean).length;
+function S1_Purpose({purpose,setPurpose}) {
   return (
     <Shell>
-      <Label>Q.01 ── DXのもやもや、言語化します</Label>
-      <div style={{fontFamily:VB,fontSize:"clamp(1.1rem,3.5vw,2.8rem)",color:C.text,fontWeight:700,lineHeight:1.3,marginBottom:"clamp(.5rem,2vw,.75rem)"}}>当てはまるものを<br/><span style={{color:C.blue}}>タップしてください。</span></div>
-      {count>0&&(<div style={{fontFamily:V,fontSize:"clamp(.6rem,2vw,.7rem)",color:C.teal,letterSpacing:".1em",marginBottom:"clamp(.4rem,1.5vw,.6rem)",animation:"fadeIn .3s ease",display:"flex",alignItems:"center",gap:".4rem"}}><span>✓</span>{count}項目 共感 ── その課題、一緒に解決できます</div>)}
-      <div style={{display:"flex",flexDirection:"column",gap:"clamp(.3rem,1.2vw,.45rem)"}}>
-        {DX_MOYAS.map(m=>{const on=!!checks[m.id]; return (
-          <div key={m.id} onClick={(e)=>toggle(m.id,e)} style={{border:`1.5px solid ${on?"rgba(30,64,175,.45)":"rgba(30,64,175,.1)"}`,background:on?"rgba(30,64,175,.06)":"rgba(255,255,255,.7)",padding:"clamp(.55rem,2.2vw,.8rem) clamp(.75rem,3vw,1rem)",cursor:"pointer",transition:"all .2s",display:"flex",alignItems:"center",gap:".75rem",WebkitTapHighlightColor:"transparent",position:"relative"}}>
-            <span style={{fontSize:"clamp(1rem,3.5vw,1.25rem)",flexShrink:0}}>{m.icon}</span>
-            <span style={{fontFamily:VB,fontSize:"clamp(.75rem,2.7vw,.88rem)",color:on?C.blue:C.muted,fontWeight:on?600:400,lineHeight:1.5,flex:1}}>{m.text}</span>
-            <span style={{fontFamily:V,fontSize:"clamp(.7rem,2.5vw,.8rem)",color:on?C.blue:"rgba(30,64,175,.2)",flexShrink:0,width:20,textAlign:"center",transition:"all .2s"}}>{on?"✓":"○"}</span>
-          </div>
-        );})}
+      <Label>PURPOSE ── 今日の面談テーマ</Label>
+      <div style={{fontFamily:VB,fontSize:"clamp(1rem,3.5vw,2.5rem)",color:C.text,fontWeight:700,lineHeight:1.3,marginBottom:"clamp(.75rem,3vw,1.25rem)"}}>
+        今回のテーマ、<br/><span style={{color:C.blue}}>どれに近いですか？</span>
       </div>
-      {count>=2&&(<div key={count} style={{marginTop:"clamp(.6rem,2.5vw,.9rem)",fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:C.blue,fontWeight:600,lineHeight:1.7,background:"rgba(30,64,175,.04)",border:"1px solid rgba(30,64,175,.12)",padding:"clamp(.65rem,2.5vw,.9rem)",animation:"fadeIn .4s ease"}}>✦ その課題、okicomはまさに得意領域です。<br/><span style={{color:C.dim,fontWeight:400}}>「何から始めるか」の整理から、一緒に進めましょう。</span></div>)}
-      <div style={{fontFamily:V,fontSize:"clamp(.58rem,2vw,.65rem)",color:"rgba(30,64,175,.22)",marginTop:"clamp(.4rem,1.5vw,.6rem)",letterSpacing:".1em"}}>▸ 複数選択OK ── 正直に選んでください</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"clamp(.45rem,1.8vw,.7rem)",marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>
+        {PURPOSES.map(p=>(
+          <button key={p.key} onClick={()=>{sfxSelect();setPurpose(p.key);}}
+            style={{border:`1.5px solid ${purpose===p.key?"rgba(30,64,175,.5)":"rgba(30,64,175,.15)"}`,background:purpose===p.key?"rgba(30,64,175,.07)":"rgba(255,255,255,.72)",padding:"clamp(.75rem,3vw,1.1rem)",cursor:"pointer",textAlign:"left",WebkitTapHighlightColor:"transparent",transition:"all .22s",display:"flex",flexDirection:"column",gap:".35rem",position:"relative"}}>
+            {purpose===p.key&&<Corners color={C.blue} size={12} t={1}/>}
+            <span style={{fontSize:"clamp(1.1rem,3.5vw,1.4rem)"}}>{p.icon}</span>
+            <span style={{fontFamily:VB,fontSize:"clamp(.82rem,2.8vw,.95rem)",color:purpose===p.key?C.blue:C.text,fontWeight:700,lineHeight:1.3}}>{p.label}</span>
+            <span style={{fontFamily:V,fontSize:"clamp(.58rem,1.8vw,.64rem)",color:purpose===p.key?"rgba(30,64,175,.6)":"rgba(100,116,139,.5)",lineHeight:1.45}}>{p.sub}</span>
+          </button>
+        ))}
+      </div>
+      {purpose?(
+        <div style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:C.blue,background:"rgba(30,64,175,.04)",border:"1px solid rgba(30,64,175,.12)",padding:"clamp(.65rem,2.5vw,.9rem)",lineHeight:1.75,animation:"fadeIn .4s ease"}}>
+          ✦ 了解しました。その観点で整理を進めます。<br/>
+          <span style={{color:C.dim,fontWeight:400}}>次に業種を選んで、文脈を合わせましょう。</span>
+        </div>
+      ):(
+        <div style={{fontFamily:V,fontSize:"clamp(.6rem,2vw,.7rem)",color:"rgba(30,64,175,.25)",letterSpacing:".1em"}}>▸ 複数当てはまる場合は、今日のメインテーマを選んでください</div>
+      )}
     </Shell>
   );
 }
 
-/* S2: INDUSTRY SELECT */
+/* S2: INDUSTRY ── 補助情報として業種を選ぶ */
 const INDUSTRIES=[
   {key:"transport",   label:"運送・物流",      icon:"🚚",sub:"基幹システム・配送管理"},
   {key:"cleaning",    label:"クリーニング・製造",icon:"🏭",sub:"在庫・進捗トラッキング"},
@@ -1267,8 +1270,8 @@ const INDUSTRIES=[
 function S2_Industry({industry,setIndustry}) {
   return (
     <Shell>
-      <Label>INDUSTRY ── 御社の業界を選んでください</Label>
-      <div style={{fontFamily:VB,fontSize:"clamp(1rem,3.2vw,2rem)",color:C.text,fontWeight:700,lineHeight:1.4,marginBottom:"clamp(.75rem,3vw,1.25rem)"}}>業界特有の課題を<br/><span style={{color:C.blue}}>一緒に確認します。</span></div>
+      <Label>INDUSTRY ── 補足：業種を教えてください</Label>
+      <div style={{fontFamily:VB,fontSize:"clamp(1rem,3.2vw,2rem)",color:C.text,fontWeight:700,lineHeight:1.4,marginBottom:"clamp(.75rem,3vw,1.25rem)"}}>業界の文脈に合わせて<br/><span style={{color:C.blue}}>課題を整理します。</span></div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"clamp(.35rem,1.5vw,.55rem)"}}>
         {INDUSTRIES.map(ind=>(
           <button key={ind.key} onClick={()=>{sfxSelect();setIndustry(ind.key);}}
@@ -1278,7 +1281,7 @@ function S2_Industry({industry,setIndustry}) {
           </button>
         ))}
       </div>
-      {industry&&(<div style={{fontFamily:V,fontSize:"clamp(.6rem,2vw,.7rem)",color:C.teal,letterSpacing:".1em",marginTop:"clamp(.75rem,3vw,1rem)",animation:"fadeIn .3s ease",display:"flex",gap:".5rem",alignItems:"center"}}><span style={{color:C.teal}}>✓</span>{INDUSTRIES.find(i=>i.key===industry)?.label} を選択 ── 次のスライドで課題を確認</div>)}
+      {industry&&(<div style={{fontFamily:V,fontSize:"clamp(.6rem,2vw,.7rem)",color:C.teal,letterSpacing:".1em",marginTop:"clamp(.75rem,3vw,1rem)",animation:"fadeIn .3s ease",display:"flex",gap:".5rem",alignItems:"center"}}><span style={{color:C.teal}}>✓</span>{INDUSTRIES.find(i=>i.key===industry)?.label} ── 次のスライドで、当てはまる課題を確認します</div>)}
     </Shell>
   );
 }
@@ -1294,62 +1297,92 @@ const PAIN_DATA={
   sign:{title:"営業力が「個人の頭の中」に止まっている",pains:["顧客情報・商談履歴・受注状況がスプレッドシート頼り","担当者が変わると過去の経緯が全部消える","経営者が営業状況をリアルタイムで把握できない","属人化した営業ノウハウが組織の資産にならない"],detail:["担当者ごとに異なるフォーマットのExcelが存在。集計のたびにコピペと目視確認。入力漏れもルールも人によってバラバラ。","引き継ぎ書を作っても「あのお客さんは○○が好きで…」という暗黙知が引き継げない。関係が一から構築し直しになる。","「今月の進捗どう？」と聞くたびに担当者に確認が必要。週次報告が来るまで経営者は数字の実態を知れない。","トップ営業の成功パターンが言語化されないまま。退職とともにノウハウが会社から消える繰り返し。"]},
 };
 function S3_Pain({industry}) {
-  const [open,setOpen]=useState({});
+  const [selected,setSelected]=useState({});
   const data=PAIN_DATA[industry]||PAIN_DATA["mfg"];
   const ind=INDUSTRIES.find(i=>i.key===industry)||INDUSTRIES[4];
+  const count=Object.values(selected).filter(Boolean).length;
   return (
     <Shell>
-      <Label>PAIN ── {ind.icon} {ind.label}の課題</Label>
-      <div style={{fontFamily:VB,fontSize:"clamp(1.1rem,3.2vw,2.5rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.75rem,3vw,1.25rem)"}}>
-        {data.title.split("").map((c,i)=>c==="「"||c==="」"?<span key={i} style={{color:C.amber}}>{c}</span>:<span key={i}>{c}</span>)}
+      <Label>PAIN ── {ind.icon} {ind.label}</Label>
+      <div style={{fontFamily:VB,fontSize:"clamp(1rem,3.2vw,2rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.4rem,1.5vw,.6rem)"}}>
+        御社に<span style={{color:C.blue}}>当てはまるのは</span>どれですか？
       </div>
-      <div style={{display:"flex",flexDirection:"column",gap:"clamp(.35rem,1.5vw,.5rem)"}}>
-        {data.pains.map((pain,i)=>(
-          <div key={i} onClick={(e)=>{e.stopPropagation();sfxClick();setOpen(p=>({...p,[i]:!p[i]}));}}
-            style={{border:`1px solid ${open[i]?"rgba(30,64,175,.3)":"rgba(30,64,175,.1)"}`,background:open[i]?"rgba(30,64,175,.04)":"rgba(255,255,255,.6)",padding:"clamp(.65rem,2.5vw,.9rem) clamp(.75rem,3vw,1rem)",cursor:"pointer",transition:"all .2s",display:"flex",flexDirection:"column",gap:".4rem",WebkitTapHighlightColor:"transparent"}}>
-            <div style={{display:"flex",alignItems:"center",gap:".75rem"}}>
-              <span style={{color:C.amber,fontFamily:V,fontSize:"clamp(.7rem,2.5vw,.82rem)",flexShrink:0,width:20,textAlign:"center"}}>{open[i]?"▼":"▶"}</span>
-              <span style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:open[i]?C.blue:C.muted,fontWeight:open[i]?600:500,lineHeight:1.4}}>{pain}</span>
+      {count>0&&(
+        <div style={{fontFamily:V,fontSize:"clamp(.6rem,2vw,.7rem)",color:C.teal,letterSpacing:".1em",marginBottom:"clamp(.4rem,1.5vw,.6rem)",animation:"fadeIn .3s ease",display:"flex",alignItems:"center",gap:".4rem"}}>
+          <span>✓</span>{count}件 当てはまる ── この課題が、整理の出発点になります
+        </div>
+      )}
+      <div style={{display:"flex",flexDirection:"column",gap:"clamp(.3rem,1.2vw,.45rem)"}}>
+        {data.pains.map((pain,i)=>{
+          const on=!!selected[i];
+          return (
+            <div key={i} onClick={e=>{e.stopPropagation();sfxClick();setSelected(p=>({...p,[i]:!p[i]}));}}
+              style={{border:`1.5px solid ${on?"rgba(30,64,175,.45)":"rgba(30,64,175,.1)"}`,background:on?"rgba(30,64,175,.06)":"rgba(255,255,255,.7)",padding:"clamp(.6rem,2.2vw,.85rem) clamp(.75rem,3vw,1rem)",cursor:"pointer",transition:"all .2s",WebkitTapHighlightColor:"transparent"}}>
+              <div style={{display:"flex",alignItems:"flex-start",gap:".75rem"}}>
+                <span style={{fontFamily:V,fontSize:"clamp(.7rem,2.5vw,.8rem)",color:on?C.blue:"rgba(30,64,175,.2)",flexShrink:0,width:20,textAlign:"center",marginTop:".1rem",transition:"all .2s"}}>{on?"✓":"○"}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:on?C.blue:C.muted,fontWeight:on?600:400,lineHeight:1.5}}>{pain}</div>
+                  {on&&(
+                    <div style={{marginTop:".45rem",fontFamily:VB,fontSize:"clamp(.7rem,2.5vw,.8rem)",color:C.dim,lineHeight:1.75,animation:"fadeIn .25s ease",borderLeft:"2px solid rgba(30,64,175,.12)",paddingLeft:".65rem"}}>
+                      {data.detail[i]}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-            {open[i]&&(<div style={{paddingLeft:"clamp(1.4rem,4vw,2.2rem)",fontFamily:VB,fontSize:"clamp(.72rem,2.5vw,.82rem)",color:C.dim,lineHeight:1.8,animation:"fadeIn .25s ease",borderLeft:"2px solid rgba(30,64,175,.15)",marginLeft:"calc(clamp(.7rem,2.5vw,.82rem) + 10px)"}}>{data.detail[i]}</div>)}
-          </div>
-        ))}
+          );
+        })}
       </div>
-      <div style={{fontFamily:V,fontSize:"clamp(.58rem,2vw,.68rem)",color:"rgba(30,64,175,.25)",marginTop:"clamp(.5rem,2vw,.75rem)",letterSpacing:".1em"}}>▸ 各項目をタップして展開 ── 御社の状況と照合してください</div>
+      {count>=2&&(
+        <div key={count} style={{marginTop:"clamp(.6rem,2.5vw,.9rem)",fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:C.blue,fontWeight:600,lineHeight:1.75,background:"rgba(30,64,175,.04)",border:"1px solid rgba(30,64,175,.12)",padding:"clamp(.65rem,2.5vw,.9rem)",animation:"fadeIn .4s ease"}}>
+          ✦ その{count}点、具体的に整理できます。<br/>
+          <span style={{color:C.dim,fontWeight:400}}>次に、放置した場合の構造的なリスクを確認します。</span>
+        </div>
+      )}
+      <div style={{fontFamily:V,fontSize:"clamp(.58rem,2vw,.65rem)",color:"rgba(30,64,175,.22)",marginTop:"clamp(.4rem,1.5vw,.6rem)",letterSpacing:".1em"}}>▸ 当てはまるものをタップ ── タップで詳細も確認できます</div>
     </Shell>
   );
 }
 
-/* S4: CASE */
-const CASE_DATA={
-  transport:{label:"大手運送業",before:"毎日数万件の問い合わせ処理に古い基幹システムが対応できず、新サービス展開が不可能な状態。IT部門と現場の認識ギャップも深刻。",action:"現場・IT部門・okicomの3者で「本当に困っている業務」を丁寧に整理。将来の拡張を前提に、基幹システムを一から再設計。",after:"最新環境へ無理なく移行。業務変更にも柔軟な基盤を確保。現在は請求業務まで広げる第2フェーズへ。会社の成長を止めない土台を構築。"},
-  cleaning:{label:"クリーニング業",before:"大量の制服・リネンの進捗・在庫が紙管理。「今どこ？」確認だけで時間が消え、紛失も発生。電話確認が絶えない状態。",action:"RFID技術を採用し、全物品の所在・工程進捗を誰でもリアルタイムに把握できる仕組みを構築。",after:"電話確認が激減し現場・営業が状況を即把握。ロス削減と業務スピード向上。「探す仕事」から「回す仕事」へ転換完了。"},
-  school:{label:"専門学校",before:"学生の履修・単位管理がExcel頼り。把握・分析に時間がかかり、教職員によって情報精度にバラつき。指導が属人的に。",action:"学生・カリキュラム・単位を一元管理できるシステムを構築。「見ればわかる」状態に整備。",after:"学生指導がスムーズに。分析・レポート作成が簡単に。職員間の情報共有が改善。教育品質を「感覚」から「見える化」へ転換。"},
-  care:{label:"介護事業者",before:"施設情報が古く空き状況等の詳細が不明。利用者・自治体とも事業者探しに多大な時間がかかり、マッチング精度が低い。",action:"沖縄特化の検索プラットフォームを構築。事業者と密に連携し常に最新情報を反映できる仕組みを整備。",after:"事業者を探す時間を大幅短縮。利用者と事業者のマッチング精度が向上。「選べない介護」から「選べる介護」へ。"},
-  mfg:{label:"製造業（公共事業）",before:"公共事業の予算・工期が頻繁に変わり、生産・在庫調整を都度手作業でやり直し。情報の散在で経営判断が遅れていた。",action:"発注状況を踏まえ生産・販売・在庫を一元管理するシステムを構築。変更が出てもすぐ修正できる仕組みを整備。",after:"生産数を最適化。急な変更にも柔軟に対応。「変わる前提」で回せる製造体制を実現。"},
-  construction:{label:"建設会社",before:"紙の日報では最終決算まで案件が黒字かどうかわからない。原価・稼働が別管理で合算に手間がかかり、判断が感覚頼り。",action:"Webで原価と人の稼働を一元管理する仕組みをローコード開発で短期間に構築。リアルタイム原価可視化を実現。",after:"案件ごとの利益がリアルタイムで見える化。将来の収益予測が可能に。勘と経験から、データで判断する経営へ進化。"},
-  sign:{label:"看板製作業",before:"営業進捗・仕様・顧客情報が担当者の頭とスプレッドシートだけに存在。担当変更で情報消失、経営者はリアルタイム把握不可。",action:"顧客・営業・売上を一元管理する仕組みを導入。情報を共有化し、経営者のダッシュボードを整備。",after:"経営者がリアルタイムで状況把握。営業履歴が会社資産に蓄積。営業が「個人技」から「組織力」へと転換。"},
-};
-function S4_Case({industry}) {
-  const [step,setStep]=useState(0);
-  const data=CASE_DATA[industry]||CASE_DATA["mfg"];
-  const ind=INDUSTRIES.find(i=>i.key===industry)||INDUSTRIES[4];
-  const steps=[{label:"BEFORE",color:C.danger,icon:"⚠",text:data.before},{label:"ACTION",color:C.teal,icon:"⚡",text:data.action},{label:"AFTER",color:"#16a34a",icon:"✓",text:data.after}];
+/* S4: RISK ── 放置した場合の構造的リスク */
+function S4_Risk() {
+  const [open,setOpen]=useState({});
+  const risks=[
+    {icon:"🔒",title:"属人化が固定される",
+     detail:"「あの人がいないと回らない」という状態は、放置するほど深刻になります。担当者が異動・退職したとき、業務が止まる構造が組織に残り続けます。"},
+    {icon:"📉",title:"小さな判断ミスが積み重なる",
+     detail:"データがないまま意思決定を続けると、個々のミスは小さくても積み重なります。後から振り返ると「あの判断が分岐点だった」と気づくことが多い。"},
+    {icon:"🏗️",title:"変えるコストが上がり続ける",
+     detail:"システムも業務フローも、後から変えようとするほど影響範囲が広がります。早い段階で整理するほど、変更コストは下がります。逆もまた然り。"},
+    {icon:"🔄",title:"改善の議論が前に進まない",
+     detail:"「何とかしたい」という声はあっても、何から始めるかが決まらないまま、同じ課題の会議が繰り返されます。構造化されない議論は疲弊だけを生みます。"},
+  ];
   return (
     <Shell>
-      <Label>CASE ── {ind.icon} {ind.label} 導入事例</Label>
-      <div style={{display:"flex",gap:"clamp(.3rem,1.5vw,.5rem)",marginBottom:"clamp(.75rem,3vw,1.25rem)"}}>
-        {steps.map((s,i)=>(<button key={i} onClick={()=>{sfxSelect();setStep(i);}} style={{flex:1,border:`1.5px solid ${step===i?s.color+"66":"rgba(30,64,175,.12)"}`,background:step===i?s.color+"0e":"rgba(255,255,255,.6)",color:step===i?s.color:C.dim,fontFamily:V,fontSize:"clamp(.62rem,2.2vw,.72rem)",padding:"clamp(.45rem,2vw,.65rem)",cursor:"pointer",letterSpacing:".12em",WebkitTapHighlightColor:"transparent",transition:"all .2s",textAlign:"center"}}>{s.label}</button>))}
+      <Label>RISK ── 放置した場合の構造的リスク</Label>
+      <div style={{fontFamily:VB,fontSize:"clamp(1rem,3.2vw,2.2rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>
+        「いつかやろう」が、<br/><span style={{color:C.danger}}>コストを積み上げている。</span>
       </div>
-      {steps.map((s,i)=>step===i&&(
-        <div key={i} style={{animation:"fadeIn .4s ease",position:"relative",padding:"clamp(1rem,4vw,1.5rem)",background:"rgba(255,255,255,.75)",border:`1px solid ${s.color}22`}}>
-          <Corners color={s.color} size={18} t={1.5}/>
-          <div style={{fontFamily:V,fontSize:"clamp(.65rem,2.5vw,.75rem)",color:s.color,letterSpacing:".15em",marginBottom:".75rem",display:"flex",alignItems:"center",gap:".5rem"}}><span>{s.icon}</span>{s.label}</div>
-          <div style={{fontFamily:VB,fontSize:"clamp(.85rem,3vw,1rem)",color:C.text,lineHeight:1.85,fontWeight:400}}>{s.text}</div>
-          {i===2&&(<div style={{marginTop:"1rem",fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.88rem)",color:"#16a34a",fontWeight:600,borderLeft:"3px solid #16a34a",paddingLeft:".75rem"}}>👉 okicomが実現した変化</div>)}
-        </div>
-      ))}
-      <div style={{fontFamily:V,fontSize:"clamp(.58rem,2vw,.68rem)",color:"rgba(30,64,175,.25)",marginTop:".75rem",letterSpacing:".1em"}}>▸ BEFORE / ACTION / AFTER をタップして展開</div>
+      <div style={{display:"flex",flexDirection:"column",gap:"clamp(.35rem,1.5vw,.5rem)"}}>
+        {risks.map((r,i)=>(
+          <div key={i} onClick={e=>{e.stopPropagation();sfxClick();setOpen(p=>({...p,[i]:!p[i]}));}}
+            style={{border:`1px solid ${open[i]?"rgba(220,38,38,.25)":"rgba(30,64,175,.1)"}`,background:open[i]?"rgba(220,38,38,.03)":"rgba(255,255,255,.65)",padding:"clamp(.6rem,2.2vw,.85rem) clamp(.75rem,3vw,1rem)",cursor:"pointer",transition:"all .2s",WebkitTapHighlightColor:"transparent"}}>
+            <div style={{display:"flex",alignItems:"center",gap:".75rem"}}>
+              <span style={{fontSize:"clamp(.95rem,3vw,1.15rem)",flexShrink:0}}>{r.icon}</span>
+              <span style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:open[i]?C.danger:C.text,fontWeight:600,flex:1,lineHeight:1.4}}>{r.title}</span>
+              <span style={{fontFamily:V,fontSize:".75rem",color:open[i]?C.danger:"rgba(30,64,175,.25)",flexShrink:0}}>{open[i]?"▼":"▶"}</span>
+            </div>
+            {open[i]&&(
+              <div style={{marginTop:".55rem",paddingLeft:"clamp(1.8rem,4vw,2.6rem)",fontFamily:VB,fontSize:"clamp(.72rem,2.5vw,.82rem)",color:C.dim,lineHeight:1.8,animation:"fadeIn .25s ease",borderLeft:"2px solid rgba(220,38,38,.15)"}}>
+                {r.detail}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div style={{marginTop:"clamp(.65rem,2.5vw,.9rem)",fontFamily:V,fontSize:"clamp(.6rem,2vw,.7rem)",color:"rgba(30,64,175,.25)",letterSpacing:".1em"}}>
+        ▸ 煽りではなく、構造的な事実です ── 「いつやるか」の判断材料として
+      </div>
     </Shell>
   );
 }
@@ -1402,27 +1435,56 @@ function S7_Value() {
   );
 }
 
-/* S8: SCOPE */
-function S8_Scope() {
-  const [active,setActive]=useState(0);
-  const services=[
-    {label:"システム受託開発",icon:"💻",color:C.blue,points:["業務フロー整理→要件定義→開発→保守までワンストップ","AI/RPA/ローコード/スクラッチを状況に合わせて選択","建設・不動産・航空・製造など業界特化に対応"],badge:"航空・建設・物流等 多業種実績"},
-    {label:"広告運用・Web制作",icon:"📣",color:"#7c3aed",points:["Google/Yahoo!/SNS（Instagram・X・LINE・TikTok）対応","LP・動画・パンフレット制作をワンストップで提供","データ分析・SEO改善でROIを継続的に最大化"],badge:"デジタルマーケティング全対応"},
-    {label:"ITインフラ・セキュリティ",icon:"🛡️",color:C.teal,points:["サーバー・クラウド・ネットワーク構築・保守","オンプレミス→クラウド移行支援","セキュリティ診断・対策・インシデント対応"],badge:"インフラ・クラウド・セキュリティ"},
-    {label:"DX支援・RPA/AI導入",icon:"🤖",color:C.amber,points:["kintoneなどローコードツールを活用したスピードDX","RPA（自動化ロボット）による業務効率化","AIチャットボット・予測分析の業務組み込み"],badge:"ローコード・RPA・AI活用"},
+/* S8: CONDITION ── 次に進める条件の明示 */
+function S8_Condition() {
+  const [active,setActive]=useState(null);
+  const conditions=[
+    {num:"01",icon:"🎯",color:C.blue,
+     title:"目的の明確化",
+     check:"何を解決したいかが、言葉にできている",
+     detail:"「なんとなく効率化したい」ではなく、「○○という業務で△△という問題が起きている」という粒度で整理されている状態。\nこれが曖昧なまま進むと、要件が後から揺れます。"},
+    {num:"02",icon:"📐",color:C.teal,
+     title:"対象範囲の特定",
+     check:"どの業務・部門・フローを対象にするかが絞れている",
+     detail:"全部一気にやろうとすると、どこから手をつけるかで止まります。「まずここから」が決まっていれば、小さく始めることができます。"},
+    {num:"03",icon:"👥",color:"#7c3aed",
+     title:"関係者の整理",
+     check:"誰が決定権を持ち、誰が実務で使うかが見えている",
+     detail:"決裁者・業務担当者・IT担当者の認識がズレていると、後から「やっぱり違う」が起きやすい。\n最初から全員の認識を揃えておくことが、手戻りを減らします。"},
   ];
-  const sv=services[active];
   return (
     <Shell>
-      <Label>SCOPE ── サービス領域</Label>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"clamp(.3rem,1.2vw,.45rem)",marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>
-        {services.map((s,i)=>(<button key={i} onClick={()=>{sfxSelect();setActive(i);}} style={{border:`1.5px solid ${active===i?s.color+"66":"rgba(30,64,175,.12)"}`,background:active===i?s.color+"09":"rgba(255,255,255,.65)",color:active===i?s.color:C.dim,fontFamily:VB,fontSize:"clamp(.7rem,2.5vw,.82rem)",fontWeight:active===i?700:500,padding:"clamp(.55rem,2.2vw,.8rem) clamp(.6rem,2.5vw,.9rem)",cursor:"pointer",textAlign:"left",WebkitTapHighlightColor:"transparent",transition:"all .2s",display:"flex",flexDirection:"column",gap:".25rem"}}><span style={{fontSize:"clamp(.9rem,3.5vw,1.15rem)"}}>{s.icon}</span><span style={{lineHeight:1.3}}>{s.label}</span></button>))}
+      <Label>CONDITION ── 次に進める条件</Label>
+      <div style={{fontFamily:VB,fontSize:"clamp(1rem,3.2vw,2rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>
+        「見積りを出す」ではなく、<br/><span style={{color:C.blue}}>「見積りを出せる状態」をつくる。</span>
       </div>
-      <div key={active} style={{animation:"fadeIn .35s ease",border:`1px solid ${sv.color}22`,background:"rgba(255,255,255,.75)",padding:"clamp(.75rem,3vw,1.1rem)",position:"relative"}}>
-        <Corners color={sv.color} size={16} t={1.2}/>
-        <div style={{fontFamily:V,fontSize:"clamp(.58rem,1.8vw,.68rem)",color:sv.color,letterSpacing:".12em",marginBottom:".5rem"}}>{sv.badge}</div>
-        <div style={{display:"flex",flexDirection:"column",gap:".45rem"}}>
-          {sv.points.map((p,i)=>(<div key={i} style={{display:"flex",gap:".6rem",alignItems:"flex-start"}}><span style={{color:sv.color,fontFamily:V,fontSize:".72rem",marginTop:".15rem",flexShrink:0}}>✓</span><span style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:C.text,lineHeight:1.65}}>{p}</span></div>))}
+      <div style={{display:"flex",flexDirection:"column",gap:"clamp(.4rem,1.5vw,.6rem)"}}>
+        {conditions.map((c,i)=>(
+          <div key={i} onClick={()=>{sfxSelect();setActive(active===i?null:i);}}
+            style={{border:`1.5px solid ${active===i?c.color+"55":"rgba(30,64,175,.1)"}`,background:active===i?c.color+"06":"rgba(255,255,255,.65)",padding:"clamp(.7rem,2.8vw,1rem) clamp(.75rem,3vw,1.1rem)",cursor:"pointer",transition:"all .2s",position:"relative"}}>
+            {active===i&&<Corners color={c.color} size={14} t={1.2}/>}
+            <div style={{display:"flex",alignItems:"center",gap:".75rem"}}>
+              <span style={{fontFamily:V,fontSize:"clamp(.7rem,2.8vw,.85rem)",color:c.color,flexShrink:0}}>{c.num}</span>
+              <span style={{fontSize:"clamp(.9rem,3vw,1.1rem)",flexShrink:0}}>{c.icon}</span>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontFamily:VB,fontSize:"clamp(.85rem,3vw,1rem)",color:active===i?c.color:C.text,fontWeight:600}}>{c.title}</div>
+                <div style={{fontFamily:V,fontSize:"clamp(.6rem,2vw,.68rem)",color:active===i?c.color+"99":"rgba(100,116,139,.55)",marginTop:".1rem"}}>{c.check}</div>
+              </div>
+              <span style={{marginLeft:"auto",fontFamily:V,fontSize:".8rem",color:c.color,opacity:.45,flexShrink:0}}>{active===i?"▼":"▶"}</span>
+            </div>
+            {active===i&&(
+              <div style={{marginTop:".65rem",fontFamily:VB,fontSize:"clamp(.75rem,2.7vw,.88rem)",color:C.dim,lineHeight:1.8,animation:"fadeIn .3s ease",whiteSpace:"pre-line"}}>
+                {c.detail}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div style={{marginTop:"clamp(.75rem,3vw,1.1rem)",background:"rgba(30,64,175,.04)",border:"1px solid rgba(30,64,175,.1)",padding:"clamp(.65rem,2.5vw,.9rem)"}}>
+        <div style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:C.blue,fontWeight:600,marginBottom:".4rem"}}>→ この3点が揃ったとき</div>
+        <div style={{fontFamily:VB,fontSize:"clamp(.75rem,2.7vw,.88rem)",color:C.muted,lineHeight:1.75}}>
+          要件整理 → 概算検討 → 正式見積 へと進めます。<br/>
+          今日の段階では、どこが整理されてどこが曖昧かを確認することが目的です。
         </div>
       </div>
     </Shell>
@@ -1430,59 +1492,112 @@ function S8_Scope() {
 }
 
 /* S9: FLOW */
+/* S9: FLOW ── 今日の面談から次に進むための整理 */
 function S9_Flow() {
-  const [active,setActive]=useState(null);
+  const [open,setOpen]=useState({});
   const steps=[
-    {num:"01",label:"ヒアリング",detail:"WEB打ち合わせでご要望・課題・予算感を整理",icon:"💬"},
-    {num:"02",label:"提案・見積",detail:"最適プランと見積もりを提示。費用感を早期に明示します",icon:"📋"},
-    {num:"03",label:"ご契約",detail:"内容にご納得いただけたら契約締結。原則前払いですが相談可",icon:"📝"},
-    {num:"04",label:"設計・開発",detail:"要件定義→設計→開発→テスト。広告は媒体選定・制作も並行",icon:"⚙️"},
-    {num:"05",label:"納品・運用開始",detail:"本番リリース・操作説明。広告はレポートとPDCA開始",icon:"🚀"},
-    {num:"06",label:"保守・改善",detail:"定期点検・保守・改善提案で効果を継続的に最大化",icon:"🔄"},
+    {num:"今日",icon:"🗣️",color:C.blue,
+     label:"状況の言語化",
+     note:"今日の面談がこれ",
+     detail:"目的・課題・現状を言葉にする場です。okicom側は整理の補助をします。この場で決める必要は何もありません。"},
+    {num:"次回",icon:"📐",color:C.teal,
+     label:"要件整理・概算確認",
+     note:"関係者が揃ってから",
+     detail:"対象範囲が絞れたら、要件を整理して概算の感触をお伝えします。決裁者・実務者が同席できると、手戻りが最小になります。"},
+    {num:"その後",icon:"📋",color:"#7c3aed",
+     label:"正式見積・判断",
+     note:"社内検討に上げる段階",
+     detail:"要件が固まった時点で正式な見積もりを提示します。「いくらか」より先に「何をつくるか」が決まっている状態が理想です。"},
   ];
   return (
     <Shell>
-      <Label>FLOW ── ご利用の流れ</Label>
-      <div style={{fontFamily:VB,fontSize:"clamp(1rem,3vw,2rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>まずは相談から。<br/><span style={{color:C.blue}}>決めるのは、あなたのペースで。</span></div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"clamp(.3rem,1.2vw,.45rem)"}}>
-        {steps.map((s,i)=>(<div key={i} onClick={()=>{sfxClick();setActive(active===i?null:i);}} style={{border:`1px solid ${active===i?"rgba(30,64,175,.35)":"rgba(30,64,175,.1)"}`,background:active===i?"rgba(30,64,175,.05)":"rgba(255,255,255,.65)",padding:"clamp(.55rem,2.2vw,.8rem)",cursor:"pointer",transition:"all .2s"}}>
-          <div style={{display:"flex",alignItems:"center",gap:".5rem",marginBottom:active===i?".4rem":0}}>
-            <span style={{fontFamily:V,fontSize:"clamp(.6rem,2.2vw,.7rem)",color:C.blue}}>{s.num}</span>
-            <span style={{fontSize:"clamp(.9rem,3.5vw,1.1rem)"}}>{s.icon}</span>
-            <span style={{fontFamily:VB,fontSize:"clamp(.75rem,2.8vw,.88rem)",color:active===i?C.blue:C.text,fontWeight:600}}>{s.label}</span>
-          </div>
-          {active===i&&<div style={{fontFamily:VB,fontSize:"clamp(.7rem,2.5vw,.82rem)",color:C.dim,lineHeight:1.6,animation:"fadeIn .3s ease"}}>{s.detail}</div>}
-        </div>))}
+      <Label>NEXT ── 今日の面談から先への整理</Label>
+      <div style={{fontFamily:VB,fontSize:"clamp(1rem,3.2vw,2rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>
+        今日は<span style={{color:C.blue}}>決める場ではない</span>。<br/>整理する場です。
       </div>
-      <div style={{fontFamily:V,fontSize:"clamp(.58rem,2vw,.68rem)",color:"rgba(30,64,175,.25)",marginTop:".6rem",letterSpacing:".1em"}}>▸ 各ステップをタップして詳細確認</div>
+      <div style={{display:"flex",flexDirection:"column",gap:"clamp(.4rem,1.5vw,.6rem)"}}>
+        {steps.map((s,i)=>(
+          <div key={i} onClick={()=>{sfxClick();setOpen(p=>({...p,[i]:!p[i]}));}}
+            style={{border:`1.5px solid ${open[i]?s.color+"55":"rgba(30,64,175,.1)"}`,background:open[i]?s.color+"06":"rgba(255,255,255,.65)",padding:"clamp(.7rem,2.5vw,.95rem) clamp(.75rem,3vw,1.1rem)",cursor:"pointer",transition:"all .2s",WebkitTapHighlightColor:"transparent",position:"relative"}}>
+            {open[i]&&<Corners color={s.color} size={13} t={1}/>}
+            <div style={{display:"flex",alignItems:"center",gap:".75rem"}}>
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:".1rem",flexShrink:0,minWidth:"clamp(2rem,5vw,2.6rem)"}}>
+                <span style={{fontFamily:V,fontSize:"clamp(.55rem,1.8vw,.65rem)",color:s.color,letterSpacing:".04em"}}>{s.num}</span>
+                <span style={{fontSize:"clamp(.9rem,3vw,1.1rem)"}}>{s.icon}</span>
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontFamily:VB,fontSize:"clamp(.85rem,3vw,1rem)",color:open[i]?s.color:C.text,fontWeight:600}}>{s.label}</div>
+                <div style={{fontFamily:V,fontSize:"clamp(.6rem,2vw,.68rem)",color:"rgba(100,116,139,.55)",marginTop:".1rem"}}>{s.note}</div>
+              </div>
+              <span style={{fontFamily:V,fontSize:".8rem",color:s.color,opacity:.45,flexShrink:0}}>{open[i]?"▼":"▶"}</span>
+            </div>
+            {open[i]&&(
+              <div style={{marginTop:".6rem",paddingLeft:"clamp(2.5rem,6vw,3.2rem)",fontFamily:VB,fontSize:"clamp(.75rem,2.7vw,.88rem)",color:C.dim,lineHeight:1.8,animation:"fadeIn .3s ease"}}>
+                {s.detail}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div style={{marginTop:"clamp(.7rem,2.8vw,1rem)",background:"rgba(30,64,175,.04)",border:"1px solid rgba(30,64,175,.1)",padding:"clamp(.65rem,2.5vw,.9rem)"}}>
+        <div style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:C.muted,lineHeight:1.75}}>
+          <span style={{color:C.blue,fontWeight:600}}>今日の判断軸 ── </span>
+          「正式に検討を進める価値があるか」だけを確認してください。<br/>
+          その判断ができれば、次のステップは自然に決まります。
+        </div>
+      </div>
     </Shell>
   );
 }
 
-/* S10: CLOSE */
+/* S10: CLOSE ── 今日の判断チェックと連絡先 */
 function S10_Close() {
-  const [q,setQ]=useState(null);
-  const faqs=[
-    {q:"要件が固まっていなくても相談できますか？",a:"はい、問題ありません。「何から手をつければいいか分からない」という段階から、業務整理を一緒に進めるケースが多いです。"},
-    {q:"既存システムとの連携は可能ですか？",a:"API連携・データ移行・RPAブリッジなど柔軟に対応します。オンプレミス→クラウド移行支援も行います。"},
-    {q:"開発期間はどのくらいですか？",a:"小規模ツール：1〜3か月、部門単位：3〜6か月、基幹システム：半年以上が目安。ローコード活用で短納期にも対応できます。"},
-    {q:"AIの活用はできますか？",a:"社内生産性向上で活用実績あり。必要に応じてAIチャットボット・予測分析の業務組み込みもご提案可能です。"},
+  const [checks,setChecks]=useState({});
+  const items=[
+    {id:"a",text:"解決したい課題が、ある程度言葉にできた"},
+    {id:"b",text:"どの業務・範囲から手をつけるか、イメージが持てた"},
+    {id:"c",text:"社内で正式に検討を上げる価値があるか、判断できた"},
   ];
+  const count=Object.values(checks).filter(Boolean).length;
   return (
     <Shell>
-      <Label>CLOSE ── 今日のまとめ</Label>
-      <div style={{fontFamily:VB,fontSize:"clamp(1.1rem,3.2vw,2.5rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.75rem,3vw,1.25rem)"}}>今日、<span style={{color:C.blue}}>何か気づきは</span><br/>ありましたか？</div>
-      <div style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.92rem)",color:C.dim,lineHeight:1.85,borderLeft:"2px solid rgba(30,64,175,.12)",paddingLeft:".9rem",marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>最初から100点のシステムを目指す必要はありません。<br/><strong style={{color:C.blue}}>「まずここを動くようにしよう」</strong>という<br/>小さな一歩から始め、運用しながら育てていきます。</div>
-      <div style={{marginBottom:"clamp(.5rem,2vw,.75rem)",fontFamily:V,fontSize:"clamp(.62rem,2.2vw,.72rem)",color:"rgba(30,64,175,.4)",letterSpacing:".12em"}}>── よくある質問 ──</div>
-      <div style={{display:"flex",flexDirection:"column",gap:"clamp(.3rem,1.2vw,.45rem)",marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>
-        {faqs.map((f,i)=>(<div key={i} onClick={()=>{sfxClick();setQ(q===i?null:i);}} style={{border:`1px solid ${q===i?"rgba(30,64,175,.3)":"rgba(30,64,175,.1)"}`,background:q===i?"rgba(30,64,175,.04)":"rgba(255,255,255,.65)",padding:"clamp(.5rem,2vw,.75rem)",cursor:"pointer",transition:"all .2s"}}>
-          <div style={{fontFamily:VB,fontSize:"clamp(.75rem,2.7vw,.88rem)",color:q===i?C.blue:C.text,fontWeight:600,display:"flex",justifyContent:"space-between",gap:".5rem"}}><span>{f.q}</span><span style={{fontFamily:V,fontSize:".75rem",color:C.blue,flexShrink:0}}>{q===i?"▼":"▶"}</span></div>
-          {q===i&&<div style={{fontFamily:VB,fontSize:"clamp(.72rem,2.6vw,.85rem)",color:C.muted,lineHeight:1.7,marginTop:".5rem",animation:"fadeIn .3s ease"}}>{f.a}</div>}
-        </div>))}
+      <Label>CHECK ── 今日の面談まとめ</Label>
+      <div style={{fontFamily:VB,fontSize:"clamp(1rem,3.2vw,2rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>
+        面談後の<span style={{color:C.blue}}>確認事項</span>
       </div>
-      <div style={{background:`linear-gradient(135deg,rgba(30,64,175,.07),rgba(8,145,178,.05))`,border:"1px solid rgba(30,64,175,.15)",padding:"clamp(.75rem,3vw,1.1rem)",position:"relative"}}>
+
+      {/* 判断チェック */}
+      <div style={{display:"flex",flexDirection:"column",gap:"clamp(.3rem,1.2vw,.45rem)",marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>
+        {items.map(it=>{
+          const on=!!checks[it.id];
+          return (
+            <div key={it.id} onClick={e=>{e.stopPropagation();sfxClick();setChecks(p=>({...p,[it.id]:!p[it.id]}));}}
+              style={{border:`1.5px solid ${on?"rgba(30,64,175,.4)":"rgba(30,64,175,.1)"}`,background:on?"rgba(30,64,175,.06)":"rgba(255,255,255,.7)",padding:"clamp(.65rem,2.5vw,.9rem) clamp(.75rem,3vw,1rem)",cursor:"pointer",transition:"all .2s",display:"flex",alignItems:"flex-start",gap:".75rem",WebkitTapHighlightColor:"transparent"}}>
+              <span style={{fontFamily:V,fontSize:"clamp(.7rem,2.5vw,.8rem)",color:on?C.blue:"rgba(30,64,175,.2)",flexShrink:0,width:20,textAlign:"center",marginTop:".05rem",transition:"all .2s"}}>{on?"✓":"○"}</span>
+              <span style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:on?C.blue:C.muted,fontWeight:on?600:400,lineHeight:1.55}}>{it.text}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 状況別メッセージ */}
+      {count===3&&(
+        <div style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:"#16a34a",background:"rgba(22,163,74,.04)",border:"1px solid rgba(22,163,74,.2)",padding:"clamp(.65rem,2.5vw,.9rem)",lineHeight:1.75,animation:"fadeIn .4s ease",marginBottom:"clamp(.6rem,2.5vw,.9rem)"}}>
+          ✦ 3点とも確認できています。<br/>
+          <span style={{color:C.dim,fontWeight:400}}>関係者を含めて次の打ち合わせに進める状態です。</span>
+        </div>
+      )}
+      {count>0&&count<3&&(
+        <div style={{fontFamily:VB,fontSize:"clamp(.78rem,2.8vw,.9rem)",color:C.blue,background:"rgba(30,64,175,.04)",border:"1px solid rgba(30,64,175,.12)",padding:"clamp(.65rem,2.5vw,.9rem)",lineHeight:1.75,animation:"fadeIn .4s ease",marginBottom:"clamp(.6rem,2.5vw,.9rem)"}}>
+          残り{3-count}点が整理できると、次のステップに進めます。<br/>
+          <span style={{color:C.dim,fontWeight:400}}>曖昧な部分は、次回の打ち合わせで一緒に整理しましょう。</span>
+        </div>
+      )}
+
+      {/* 連絡先 */}
+      <div style={{background:`linear-gradient(135deg,rgba(30,64,175,.06),rgba(8,145,178,.04))`,border:"1px solid rgba(30,64,175,.14)",padding:"clamp(.75rem,3vw,1.1rem)",position:"relative"}}>
         <Corners color={C.blue} size={14} t={1.2}/>
-        <div style={{fontFamily:V,fontSize:"clamp(.58rem,2vw,.68rem)",color:C.teal,letterSpacing:".12em",marginBottom:".4rem"}}>CONTACT</div>
+        <div style={{fontFamily:V,fontSize:"clamp(.58rem,2vw,.68rem)",color:C.teal,letterSpacing:".12em",marginBottom:".5rem"}}>CONTACT</div>
         {[["TEL","098-898-5335"],["URL","okicom.co.jp"],["受付","平日 9:00〜18:00"]].map(([k,v],i,arr)=>(
           <div key={k} style={{display:"flex",borderBottom:i<arr.length-1?"1px solid rgba(30,64,175,.06)":"none"}}>
             <div style={{fontFamily:V,fontSize:"clamp(.58rem,2vw,.68rem)",color:"rgba(30,64,175,.35)",padding:".3rem .5rem",minWidth:44,flexShrink:0,display:"flex",alignItems:"center"}}>{k}</div>
@@ -1499,12 +1614,13 @@ function S10_Close() {
 // ═══════════════════════════════════════════════════════════════════
 
 const TOTAL  = 11;
-const LABELS = ["BOOT","Q.01","INDUSTRY","PAIN","CASE","3D-DEMO","KPI","VALUE","SCOPE","FLOW","CLOSE"];
+const LABELS = ["BOOT","PURPOSE","INDUSTRY","PAIN","RISK","3D-DEMO","KPI","VALUE","CONDITION","NEXT","CHECK"];
 
 export default function App() {
   const [idx,setIdx]=useState(0);
   const [dir,setDir]=useState(1);
   const [industry,setIndustry]=useState("mfg");
+  const [purpose,setPurpose]=useState(null);
   const isMobile=useIsMobile();
 
   const go=useCallback((next)=>{
@@ -1535,14 +1651,14 @@ export default function App() {
 
   const renderSlide=()=>{switch(idx){
     case 0:  return <S0_Boot/>;
-    case 1:  return <S1_Q1/>;
+    case 1:  return <S1_Purpose purpose={purpose} setPurpose={setPurpose}/>;
     case 2:  return <S2_Industry industry={industry} setIndustry={setIndustry}/>;
     case 3:  return <S3_Pain industry={industry}/>;
-    case 4:  return <S4_Case industry={industry}/>;
-    case 5:  return <S5_3DIndustryDemo industry={industry}/>;   // ← NEW
+    case 4:  return <S4_Risk/>;
+    case 5:  return <S5_3DIndustryDemo industry={industry}/>;
     case 6:  return <S6_KPIDemo industry={industry}/>;
     case 7:  return <S7_Value/>;
-    case 8:  return <S8_Scope/>;
+    case 8:  return <S8_Condition/>;
     case 9:  return <S9_Flow/>;
     case 10: return <S10_Close/>;
     default: return null;
