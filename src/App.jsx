@@ -1569,7 +1569,7 @@ export default function App() {
       <style dangerouslySetInnerHTML={{__html:css}}/>
       <OkiBg/>
       <div style={{position:"fixed",inset:0,zIndex:10,display:"flex",justifyContent:"center",alignItems:"stretch"}}>
-        <div onClick={handleAreaClick} {...swipe} style={{width:"100%",maxWidth:1100,height:"100%",display:"flex",flexDirection:"column",position:"relative",boxShadow:"0 0 60px rgba(0,0,0,0.1)",background:idx===5?"#030810":C.bg,transition:"background .4s"}}>
+        <div onClick={handleAreaClick} {...swipe} style={{width:"min(100%,1100px)",height:"100%",display:"flex",flexDirection:"column",position:"relative",boxShadow:"0 0 60px rgba(0,0,0,0.1)",background:idx===5?"#030810":C.bg,transition:"background .4s"}}>
 
           {/* TOP BAR */}
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"clamp(.4rem,2vw,.6rem) clamp(.75rem,3vw,1.25rem)",borderBottom:`1px solid ${idx===5?"rgba(255,255,255,0.05)":"rgba(30,64,175,.09)"}`,background:idx===5?"rgba(3,8,20,0.98)":"rgba(240,245,251,.97)",backdropFilter:"blur(8px)",fontFamily:V,fontSize:"clamp(.62rem,2.5vw,.72rem)",color:idx===5?"rgba(0,170,255,.3)":"rgba(30,64,175,.35)",letterSpacing:".12em",flexShrink:0,zIndex:20,gap:"clamp(.5rem,2vw,1rem)",transition:"all .4s"}}>
