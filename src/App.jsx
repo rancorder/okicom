@@ -1305,7 +1305,7 @@ function S3_Pain({industry}) {
     <Shell>
       <Label>PAIN ── {ind.icon} {ind.label}</Label>
       <div style={{fontFamily:VB,fontSize:"clamp(1rem,3.2vw,2rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.4rem,1.5vw,.6rem)"}}>
-        御社に<span style={{color:C.blue}}>当てはまるのは</span>どれですか？
+        貴社に<span style={{color:C.blue}}>当てはまるのは</span>どれですか？
       </div>
       {count>0&&(
         <div style={{fontFamily:V,fontSize:"clamp(.6rem,2vw,.7rem)",color:C.teal,letterSpacing:".1em",marginBottom:"clamp(.4rem,1.5vw,.6rem)",animation:"fadeIn .3s ease",display:"flex",alignItems:"center",gap:".4rem"}}>
@@ -1456,7 +1456,7 @@ function S8_Condition() {
     <Shell>
       <Label>CONDITION ── 次に進める条件</Label>
       <div style={{fontFamily:VB,fontSize:"clamp(1rem,3.2vw,2rem)",color:C.text,fontWeight:700,lineHeight:1.35,marginBottom:"clamp(.75rem,3vw,1.1rem)"}}>
-        「見積りを出す」ではなく、<br/><span style={{color:C.blue}}>「見積りを出せる状態」をつくる。</span>
+        貴社内で、<br/><span style={{color:C.blue}}>下記の3点は固まっていますか？</span>
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:"clamp(.4rem,1.5vw,.6rem)"}}>
         {conditions.map((c,i)=>(
